@@ -1,0 +1,10 @@
+global respire_start
+
+probe process("urspeak").provider("urspeak").mark("respire_start") {
+  // printf("start");
+  respire_start = gettimeofday_us();
+}
+
+probe process("urspeak").provider("urspeak").mark("respire_done") {
+  printf("time spent bellowing children: %ld us\n", gettimeofday_us() - respire_start);
+}

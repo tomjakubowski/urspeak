@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# WOMM -tjakubowski
+cd $(dirname $0)
+mkdir -p build
+cd build
+cmake -DBUILD_WITH_CLANG=1 -G Ninja ..
