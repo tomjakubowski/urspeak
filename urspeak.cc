@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stdio.h>
 
 #include <chrono>
 #include <iostream>
@@ -9,10 +8,10 @@
 
 #include "trace.hh"
 
-using UrClock = std::chrono::high_resolution_clock;
-using Instant = std::chrono::time_point<UrClock>;
-using Duration = std::chrono::duration<UrClock::rep>;
-using Ms = std::chrono::microseconds;
+typedef std::chrono::high_resolution_clock UrClock;
+typedef std::chrono::time_point<UrClock> Instant;
+typedef std::chrono::duration<UrClock::rep> Duration;
+typedef std::chrono::microseconds Ms;
 using std::chrono::duration_cast;
 
 class Breather {
@@ -22,18 +21,17 @@ class Breather {
 
 class FooBreather : public Breather {
  public:
-  void Breathe(Instant ts) override {
+  void Breathe(Instant ts) {
     auto ins_ms =
         std::chrono::duration<double, std::milli>(ts.time_since_epoch());
 
-    // printf("foo! %.2f\n", ins_ms.count());
-    printf("foo!\n");
+    std::cout << "foo!\n";
   }
 };
 
 class BarBreather : public Breather {
  public:
-  void Breathe(Instant ts) override { printf("bar!\n"); }
+  void Breathe(Instant ts) { std::cout << "bar!\n"; }
 };
 
 class UrestDrome {
@@ -54,6 +52,7 @@ class UrestDrome {
       breather->Breathe(frame_instant_);
     }
     // We only want to measure the time spent *before* waiting.
+    std::cout.flush();
     TRACE(URSPEAK_RESPIRE_DONE());
     const auto spent = UrClock::now() - frame_instant_;
     if (spent < respire_time_) {
@@ -70,7 +69,7 @@ class UrestDrome {
 };
 
 int main() {
-  static_assert(UrClock::is_steady, "UrClock must be steady.");
+  // static_assert(UrClock::is_steady, "UrClock must be steady.");
   const auto respiration_delta =
       duration_cast<Duration>(std::chrono::seconds(1));
   auto drome = UrestDrome{respiration_delta};

@@ -1,0 +1,205 @@
+#
+# obi configuration for sea
+#
+
+# The project name
+name: 'urspeak'
+
+# Build task
+# ----------
+# Comma-separated list of command line arguments passed to cmake
+cmake-args: ['-DCMAKE_BUILD_TYPE=RelWithDebInfo',
+             '-DCMAKE_EXPORT_COMPILE_COMMANDS=1']
+
+# Comma-separated list of arguments passed to cmake --build
+# These are sensitive to the build system generator
+# specified in the cmake-args step
+build-args: []
+
+# The directory to perform the out-of-source cmake build
+build-dir: "build"
+
+# Override the default obi build task
+# build-cmd: "([[ -d build ]] && echo $PWD && ./configure) && cmake --build build/"
+
+# Clean task
+# ----------
+# Override the default obi clean task
+# clean-cmd: ""
+
+# Stop task
+# ----------
+# Comma-separated list of command-line commands to run when stopping sea
+on-stop-cmds: []
+
+# Override the default obi stop task
+stop-cmd: "kill $(pidof urspeak) || true"
+
+# Rsync task
+# -----------
+# Comma-separated list of files to ignore when rsyncing to remote machines
+rsync-excludes: [".git", "build", "*.log", "*.sh"]
+
+# Path to the project binary from the top-level project directory
+# The target location is determined by your cmake file
+target: "build/urspeak"
+
+# Comma-separated list of command-line commands to run before launching sea
+pre-launch-cmds: []
+
+# Comma-separated list of command-line commands to run after launching sea
+post-launch-cmds: []
+
+# Override the default command to launch the application in the obi go task
+# launch-cmd: ""
+
+# Debuggers to use in obi go --debug=<debugger>
+debuggers:
+  gdb: "gdb -ex run --args"
+  lldb: "lldb --"
+  strace: "sudo strace"
+  apitrace: "apitrace trace"
+
+# 'rooms' is a map where the keys are room names. Each room has its own
+# settings which are used when you do `obi go <room-name>`
+# You can define any number of rooms here.
+# Any key, value specified at the top-level can be overriden on a per-room basis
+rooms:
+  # This setting governs what happens when the application runs on
+  # your local machine.
+  localhost:
+    env-vars: {}
+    launch-args: [
+      '--config=share/sea/config.protein',
+      '--site=share/3-site.protein',
+      'three-screen.protein',
+      'three-feld.protein'
+      # 'hex-screen.protein',
+      # 'hex-feld.protein'
+    ]
+
+  # Settings for the immersions room at the Oblong LA warehouse.  For any other
+  # environment, you'll have to change IP addresses, wands pool, etc.
+  hex:
+    env-vars: {DISPLAY: ':0'}
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      '/etc/oblong/room-screen.protein',
+      '/etc/oblong/room-feld.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.203, 10.137.124.204, 10.137.124.205, 10.137.124.206, 10.137.124.207]
+    build-args: ["-j32 -l32"]
+
+  # Settings for the immersions room at the Oblong LA warehouse.  For any other
+  # environment, you'll have to change IP addresses, wands pool, etc.
+  wall:
+    env-vars: {DISPLAY: ':0'}
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.210/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/3-site.protein',
+      '--room=/etc/oblong/room.protein',
+      '/etc/oblong/room-screen.protein',
+      '/etc/oblong/room-feld.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.200, 10.137.124.201, 10.137.124.202]
+    build-args: ["-j32 -l32"]
+
+  austin-hex:
+    env-vars: {DISPLAY: ':0'}
+    launch-args: [
+      '--wands-pool=tcp://9.3.254.56/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/15-site.protein',
+      '--room=/etc/oblong/hex-room.protein',
+      '/etc/oblong/hex-15-screen.protein',
+      '/etc/oblong/hex-15-feld.protein'
+    ]
+    user: oblong
+    hosts: [9.3.254.51, 9.3.254.52, 9.3.254.53, 9.3.254.54, 9.3.254.55]
+    build-args: ["-j32 -l32"]
+
+  hex15-a:
+    env-vars: {DISPLAY: ':0'}
+    cmake-args: ['-G "Unix Makefiles"',
+                 '-DCMAKE_BUILD_TYPE=Release']
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      'room-screen-hex.protein',
+      'room-feld-hex-a.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.203]
+    build-args: ["-j32 -l32"]
+
+  hex15-b:
+    env-vars: {DISPLAY: ':0'}
+    cmake-args: ['-G "Unix Makefiles"',
+                 '-DCMAKE_BUILD_TYPE=Release']
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      'room-screen-hex.protein',
+      'room-feld-hex-b.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.204]
+    build-args: ["-j32 -l32"]
+
+  hex15-c:
+    env-vars: {DISPLAY: ':0'}
+    cmake-args: ['-G "Unix Makefiles"',
+                 '-DCMAKE_BUILD_TYPE=Release']
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      'room-screen-hex.protein',
+      'room-feld-hex-c.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.205]
+    build-args: ["-j32 -l32"]
+
+  hex15-d:
+    env-vars: {DISPLAY: ':0'}
+    cmake-args: ['-G "Unix Makefiles"',
+                 '-DCMAKE_BUILD_TYPE=Release']
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      'room-screen-hex.protein',
+      'room-feld-hex-d.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.206]
+    build-args: ["-j32 -l32"]
+
+  hex15-e:
+    env-vars: {DISPLAY: ':0'}
+    cmake-args: ['-G "Unix Makefiles"',
+                 '-DCMAKE_BUILD_TYPE=Release']
+    launch-args: [
+      '--wands-pool=tcp://10.137.124.211/wands',
+      '--config=share/sea/config.protein',
+      '--site=share/5-site.protein',
+      '--room=/etc/oblong/room.protein',
+      'room-screen-hex.protein',
+      'room-feld-hex-e.protein'
+    ]
+    user: oblong
+    hosts: [10.137.124.207]
+    build-args: ["-j32 -l32"]
